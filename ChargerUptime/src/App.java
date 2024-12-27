@@ -42,7 +42,7 @@ public class App {
    */
   static void printError(String message) {
     System.out.println("ERROR");
-    System.err.println(message);
+    System.err.println(message); // TODO: ensure stderr, not stdout
     return;
   }
 
@@ -253,7 +253,7 @@ public class App {
     int outputIndex = 0;
     for (Entry<Integer, List<Report>> station : stationReportsMap.entrySet()) {
       output[outputIndex][0] = station.getKey().intValue();
-      output[outputIndex][1] = computeStationUptime(station.getValue());
+      output[outputIndex++][1] = computeStationUptime(station.getValue());
     }
     return output;
   }
