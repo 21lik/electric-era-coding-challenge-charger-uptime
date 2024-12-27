@@ -9,9 +9,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-public class ChargerUptime {
+/**
+ * Main application class for the Electric Era Coding Challenge for the
+ * Software Engineer (New Grad) position.
+ *
+ * @author Kevin Li
+ */
+public class App {
   static class Report implements Comparable<Report> {
-    long startTime, endTime;
+    long startTime, endTime; // unsigned long
     boolean up;
 
     Report(long startTime, long endTime, boolean up) {
@@ -23,7 +29,7 @@ public class ChargerUptime {
     @Override
     public int compareTo(Report other) {
       // Will help when merging overlapping uptime reports
-      return Long.signum(startTime == other.startTime ? endTime - other.endTime : startTime - other.startTime);
+      return startTime == other.startTime ? Long.compareUnsigned(endTime, other.endTime) : Long.compareUnsigned(startTime, other.startTime);
     }
   }
 
@@ -79,9 +85,9 @@ public class ChargerUptime {
       for (String nextLine = reader.readLine(); !nextLine.isBlank(); nextLine = reader.readLine()) {
         String[] tokens = nextLine.split(" ");
         try {
-          Integer stationId = Integer.valueOf(tokens[0]); // TODO: what if unsigned?
+          Integer stationId = Integer.valueOf(Integer.parseUnsignedInt(tokens[0]));
           for (int i = 1; i < tokens.length; i++) {
-            output.put(Integer.valueOf(tokens[i]), stationId); // TODO: what if unsigned?
+            output.put(Integer.valueOf(Integer.parseUnsignedInt(tokens[i])), stationId);
           }
         } catch (NumberFormatException e) {
           printError("Station and charger IDs must be unsigned 32-bit integers.");
@@ -127,7 +133,7 @@ public class ChargerUptime {
         // Get the charger ID
         Integer chargerId;
         try {
-          chargerId = Integer.valueOf(tokens[0]); // TODO: what if unsigned?
+          chargerId = Integer.valueOf(Integer.parseUnsignedInt(tokens[0]));
         } catch (NumberFormatException e) {
           printError("Charger IDs must be unsigned 32-bit integers.");
           // TODO: make sure above works with unsigned (2,147,483,648 or larger)
@@ -155,10 +161,10 @@ public class ChargerUptime {
         }
 
         // Put new time interval into station's time interval list
-        long startTime, endTime; // TODO: what if unsigned?
+        long startTime, endTime;
         try {
-          startTime = Long.parseLong(tokens[1]); // TODO: what if unsigned?
-          endTime = Long.parseLong(tokens[2]); // TODO: what if unsigned?
+          startTime = Long.parseUnsignedLong(tokens[1]);
+          endTime = Long.parseUnsignedLong(tokens[2]);
         } catch (NumberFormatException e) {
           printError("Start and end times must be unsigned 64-bit integers");
           reader.close();
@@ -228,6 +234,8 @@ public class ChargerUptime {
     long uptime = 0;
     for (Report report : stationTimeReports)
       uptime += report.endTime - report.startTime;
+
+    // TODO: will below work with unsigned?
     return (int) (100 * (1.0 * uptime / totalTime)); // prevent long integer overflow
   }
 
