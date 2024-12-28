@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
@@ -64,13 +65,13 @@ public class AppTest {
   }
 
   @BeforeEach
-  public void constructStreamReaders() throws FileNotFoundException {
+  public void testConstructStreamReaders() throws FileNotFoundException {
     outputReader = new BufferedReader(new FileReader(OUTPUT_FILE));
     errorReader = new BufferedReader(new FileReader(ERROR_FILE));
   }
 
   @AfterEach
-  public void closeReadersAndClearFiles() throws IOException {
+  public void testCloseReadersAndClearFiles() throws IOException {
     // Close readers
     outputReader.close();
     errorReader.close();
@@ -96,7 +97,7 @@ public class AppTest {
   // App.printError(String)
 
   @Test
-  public void printErrorWithNullMessage() {
+  public void testPrintErrorWithNullMessage() {
     App.printError(null);
     assertDoesNotThrow(() -> {
       assertEquals("ERROR", outputReader.readLine());
@@ -106,14 +107,14 @@ public class AppTest {
   }
 
   @Test
-  public void printErrorWithEmptyMessage() {
+  public void testPrintErrorWithEmptyMessage() {
     // TODO: implement
     App.printError("");
     // TODO: assert "ERROR" in stdout and "" (or "\n") in stderr
   }
 
   @Test
-  public void printErrorWithMessage() {
+  public void testPrintErrorWithMessage() {
     // TODO: implement
     int testMessageLength = (int) (Math.random() * 256);
     char[] testMessageCharArray = new char[testMessageLength];
@@ -143,7 +144,7 @@ public class AppTest {
   // App.constructReader(String)
 
   @Test
-  public void constructReaderForNullFilePrintsError() {
+  public void testConstructReaderForNullFilePrintsError() {
     Object reader = App.constructReader(null);
     // TODO: assert error message
     
@@ -157,7 +158,7 @@ public class AppTest {
   }
 
   @Test
-  public void constructReaderForNonexistentFilePrintsError() {
+  public void testConstructReaderForNonexistentFilePrintsError() {
     String fileName = getMainFilePath("file-does-not-exist.txt");
     Object reader = App.constructReader(fileName);
     // TODO: assert error message
@@ -166,7 +167,7 @@ public class AppTest {
   }
 
   @Test
-  public void constructReaderForDirectoryPrintsError() {
+  public void testConstructReaderForDirectoryPrintsError() {
     String fileName = getMainFilePath("empty_dir");
     Object reader = App.constructReader(fileName);
     // TODO: assert error message
@@ -175,7 +176,7 @@ public class AppTest {
   }
 
   @Test
-  public void constructReaderForReadableFileReturnsReader() {
+  public void testConstructReaderForReadableFileReturnsReader() {
     String fileName = getMainFilePath("empty_file.txt");
     final BufferedReader reader = App.constructReader(fileName);
     assertNotNull(reader);
@@ -187,7 +188,7 @@ public class AppTest {
   // App.readStationsSection(BufferedReader)
 
   @Test
-  public void readStationsSectionForEmptyFilePrintsError() {
+  public void testReadStationsSectionForEmptyFilePrintsError() {
     String fileName = getMainFilePath("empty_file.txt");
 
     assertDoesNotThrow(() -> {
@@ -202,7 +203,7 @@ public class AppTest {
   }
 
   @Test
-  public void readStationsSectionForFileWithoutHeadersPrintsError() {
+  public void testReadStationsSectionForFileWithoutHeadersPrintsError() {
     // TODO: implement
 
     String fileName = getMainFilePath("file_without_headers.txt");
@@ -219,7 +220,7 @@ public class AppTest {
   }
 
   @Test
-  public void readStationsSectionForFileWithoutStationsSectionPrintsError() {
+  public void testReadStationsSectionForFileWithoutStationsSectionPrintsError() {
     // TODO: implement
 
     String fileName = getMainFilePath("file_without_stations_section.txt");
@@ -236,7 +237,7 @@ public class AppTest {
   }
 
   @Test
-  public void readStationsSectionForFileWithoutNewlineSeparationPrintsError() {
+  public void testReadStationsSectionForFileWithoutNewlineSeparationPrintsError() {
     // TODO: implement
 
     String fileName = getMainFilePath("file_without_newline_separation.txt");
@@ -253,7 +254,7 @@ public class AppTest {
   }
 
   @Test
-  public void readStationsSectionForFileWithNonNumberStationIDsPrintsError() {
+  public void testReadStationsSectionForFileWithNonNumberStationIDsPrintsError() {
     // TODO: implement
 
     String fileName = getMainFilePath("file_with_non_number_station_ids.txt");
@@ -270,7 +271,7 @@ public class AppTest {
   }
 
   @Test
-  public void readStationsSectionForFileWithNonNumberChargerIDsPrintsError() {
+  public void testReadStationsSectionForFileWithNonNumberChargerIDsPrintsError() {
     // TODO: implement
 
     String fileName = getMainFilePath("file_with_non_number_charger_ids.txt");
@@ -287,7 +288,7 @@ public class AppTest {
   }
 
   @Test
-  public void readStationsSectionForFileWithNegativeStationIDsPrintsError() {
+  public void testReadStationsSectionForFileWithNegativeStationIDsPrintsError() {
     // TODO: implement
 
     String fileName = getMainFilePath("file_with_negative_station_ids.txt");
@@ -304,7 +305,7 @@ public class AppTest {
   }
 
   @Test
-  public void readStationsSectionForFileWithNegativeChargerIDsPrintsError() {
+  public void testReadStationsSectionForFileWithNegativeChargerIDsPrintsError() {
     // TODO: implement
 
     String fileName = getMainFilePath("file_with_negative_charger_ids.txt");
@@ -321,19 +322,31 @@ public class AppTest {
   }
 
   @Test
-  public void readStationsSectionForFileWithLongStationIDsPrintsError() {
+  public void testReadStationsSectionForFileWithLongStationIDsPrintsError() {
+    // TODO: implement
+
+
+    String fileName = getMainFilePath("file_with  .txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      Object map = App.readStationsSection(reader);
+      // TODO: assert error message
+
+      assertNull(map);
+      reader.close();
+    });
+  }
+
+  @Test
+  public void testReadStationsSectionForFileWithLongChargerIDsPrintsError() {
     // TODO: implement
 
   }
 
   @Test
-  public void readStationsSectionForFileWithLongChargerIDsPrintsError() {
-    // TODO: implement
-
-  }
-
-  @Test
-  public void readStationsSectionForFileWithValidIDs() {
+  public void testReadStationsSectionForFileWithValidIDs() {
     // TODO: implement
 
   }
@@ -346,8 +359,8 @@ public class AppTest {
   // App.computeStationUptime(List<Report>)
 
   @Test
-  public void computeStationUptimeClearsReportList() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeClearsReportList() {
+    List<Report> reportList = new ArrayList<>(2);
     reportList.add(new Report(0, 2, true));
     reportList.add(new Report(5, 6, false));
     App.computeStationUptime(reportList);
@@ -355,23 +368,23 @@ public class AppTest {
   }
 
   @Test
-  public void computeStationUptimeReturnsZeroOnEmptyList() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeReturnsZeroOnEmptyList() {
+    List<Report> reportList = new ArrayList<>(0);
     int output = App.computeStationUptime(reportList);
     assertEquals(0, output);
   }
 
   @Test
-  public void computeStationUptimeReturnsZeroOnNoUptime() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeReturnsZeroOnNoUptime() {
+    List<Report> reportList = new ArrayList<>(1);
     reportList.add(new Report(0, 100, false));
     int output = App.computeStationUptime(reportList);
     assertEquals(0, output);
   }
 
   @Test
-  public void computeStationUptimeIgnoresOverlappingDowntime() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeIgnoresOverlappingDowntime() {
+    List<Report> reportList = new ArrayList<>(3);
     reportList.add(new Report(0, 7, true));
     reportList.add(new Report(3, 4, false));
     reportList.add(new Report(6, 10, false));
@@ -380,8 +393,8 @@ public class AppTest {
   }
 
   @Test
-  public void computeStationUptimeMergesOverlappingUptime() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeMergesOverlappingUptime() {
+    List<Report> reportList = new ArrayList<>(3);
     reportList.add(new Report(0, 7, true));
     reportList.add(new Report(3, 4, true));
     reportList.add(new Report(6, 10, true));
@@ -390,8 +403,8 @@ public class AppTest {
   }
 
   @Test
-  public void computeStationUptimeHandlesUnsortedReports() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeHandlesUnsortedReports() {
+    List<Report> reportList = new ArrayList<>(4);
     reportList.add(new Report(2, 10, true));
     reportList.add(new Report(0, 2, false));
     reportList.add(new Report(16, 20, true));
@@ -401,8 +414,8 @@ public class AppTest {
   }
 
   @Test
-  public void computeStationUptimeCountsUnreportedTimeBetweenReportsAsDowntime() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeCountsUnreportedTimeBetweenReportsAsDowntime() {
+    List<Report> reportList = new ArrayList<>(3);
     reportList.add(new Report(0, 4, true));
     reportList.add(new Report(5, 6, false));
     reportList.add(new Report(9, 10, true));
@@ -411,8 +424,8 @@ public class AppTest {
   }
 
   @Test
-  public void computeStationUptimeIgnoresUnreportedTimeBeforeFirstStart() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeIgnoresUnreportedTimeBeforeFirstStart() {
+    List<Report> reportList = new ArrayList<>(2);
     reportList.add(new Report(1, 2, true));
     reportList.add(new Report(2, 3, false));
     int output = App.computeStationUptime(reportList);
@@ -420,8 +433,8 @@ public class AppTest {
   }
 
   @Test
-  public void computeStationUptimeTruncatesOutput() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeTruncatesOutput() {
+    List<Report> reportList = new ArrayList<>(2);
     reportList.add(new Report(0, 2, true));
     reportList.add(new Report(2, 3, false));
     int output = App.computeStationUptime(reportList);
@@ -429,8 +442,8 @@ public class AppTest {
   }
 
   @Test
-  public void computeStationUptimeHandlesLargeUnsignedLongTotalTime() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeHandlesLargeUnsignedLongTotalTime() {
+    List<Report> reportList = new ArrayList<>(2);
     reportList.add(new Report(0, Long.MIN_VALUE >>> 1, true));
     reportList.add(new Report(Long.MIN_VALUE >>> 1, Long.MIN_VALUE, false));
     int output = App.computeStationUptime(reportList);
@@ -438,8 +451,8 @@ public class AppTest {
   }
 
   @Test
-  public void computeStationUptimeHandlesLargeUnsignedLongUptime() {
-    List<Report> reportList = new ArrayList<>();
+  public void testComputeStationUptimeHandlesLargeUnsignedLongUptime() {
+    List<Report> reportList = new ArrayList<>(2);
     reportList.add(new Report(0, Long.MIN_VALUE, true));
     reportList.add(new Report(Long.MIN_VALUE, -1, false));
     int output = App.computeStationUptime(reportList);
@@ -448,7 +461,48 @@ public class AppTest {
 
   // App.computeStationUptimes(HashMap<Integer, List<Report>>)
 
-  // TODO: methods
+  @Test
+  public void testComputeStationUptimesReturnsEmptyArraysOnEmptyHashMap() {
+    HashMap<Integer, List<Report>> map = new HashMap<>(0);
+    int[][] output = App.computeStationUptimes(map);
+    assertNotNull(output);
+    assertEquals(0, output.length);
+  }
+
+  @Test
+  public void testComputeStationUptimesOutputLengthEqualsHashMapSize() {
+    int size = (int) (256 * Math.random());
+    HashMap<Integer, List<Report>> map = new HashMap<>(size << 1 + 1);
+    for (int i = 0; i < size; i++)
+      map.put(Integer.valueOf(size), new ArrayList<>(0));
+    int[][] output = App.computeStationUptimes(map);
+    assertNotNull(output);
+    assertEquals(size, output.length);
+  }
+
+  @Test
+  public void testComputeStationUptimesOutputContainsStationIDsAndUptimesInAscendingOrder() {
+    HashMap<Integer, List<Report>> map = new HashMap<>();
+    List<Report> list1 = new ArrayList<>(); // 100
+    list1.add(new Report(0, 1, true));
+    List<Report> list4 = new ArrayList<>(); // 25
+    list1.add(new Report(0, 3, false));
+    list1.add(new Report(3, 4, true));
+    List<Report> list5 = new ArrayList<>(); // 50
+    list5.add(new Report(0, 5, true));
+    list5.add(new Report(5, 10, false));
+    map.put(Integer.valueOf(5), list5);
+    map.put(Integer.valueOf(1), list1);
+    map.put(Integer.valueOf(4), list4);
+    int[][] output = App.computeStationUptimes(map);
+    assertNotNull(output);
+    assertEquals(1, output[0][0]);
+    assertEquals(100, output[0][1]);
+    assertEquals(4, output[1][0]);
+    assertEquals(25, output[1][1]);
+    assertEquals(5, output[2][0]);
+    assertEquals(50, output[2][1]);
+  }
 
   // App.printStationUptimes(int[][])
 

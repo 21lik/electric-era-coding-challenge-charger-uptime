@@ -25,7 +25,8 @@ public class App {
 
     /**
      * Create a new Report object. It is assumed that endTime is larger than
-     * startTime, in unsigned longs.
+     * startTime, in unsigned longs, and no report is reused for multiple
+     * stations.
      *
      * @param startTime the starting time, in nanoseconds
      * @param endTime   the ending time, in nanoseconds
@@ -124,9 +125,8 @@ public class App {
 
   /**
    * Read and process the Charger Availability Reports section of the file,
-   * mapping
-   * each station to its reported uptime/downtime intervals. Prints an error
-   * and returns `null` if the file format is invalid.
+   * mapping each station to its reported uptime/downtime intervals. Prints an
+   * error and returns `null` if the file format is invalid.
    *
    * @param reader     the BufferedReader for the given file
    * @param stationMap a map of each charger ID to its station ID
@@ -268,7 +268,8 @@ public class App {
 
   /**
    * Compute the uptimes for the stations, given the reported time intervals of
-   * their respective chargers.
+   * their respective chargers. It is assumed that `stationReportsMap` is not
+   * null.
    *
    * @param stationReportsMap a map of each station ID to its reported time
    *                          intervals
