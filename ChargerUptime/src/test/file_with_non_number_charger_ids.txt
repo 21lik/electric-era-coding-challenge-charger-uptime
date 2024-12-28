@@ -1,0 +1,12 @@
+[Stations]
+0 a b
+1 c
+2 d
+
+[Charger Availability Reports]
+a 0 50000 true
+a 50000 100000 true
+b 50000 100000 true
+c 25000 75000 false
+d 0 50000 true
+d 100000 200000 true
