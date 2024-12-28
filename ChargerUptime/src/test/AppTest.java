@@ -21,7 +21,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -42,6 +42,18 @@ public class AppTest {
 
   private BufferedReader outputReader;
   private BufferedReader errorReader;
+
+  /**
+   * Modify the relative file path from the test directory into a relative file
+   * path from the main directory to the same file. This is needed to test
+   * `App.constructReader(String)`, which is located in the main package.
+   *
+   * @param testFilePath the relative file path from `src/test`
+   * @return the relative file path from `src/main`
+   */
+  private static String getMainFilePath(String testFilePath) {
+    return "../test/" + testFilePath;
+  }
 
   @BeforeAll
   public static void switchStreams() throws FileNotFoundException {
@@ -85,7 +97,7 @@ public class AppTest {
 
   @Test
   public void printErrorWithNullMessage() {
-    main.App.printError(null);
+    App.printError(null);
     assertDoesNotThrow(() -> {
       assertEquals("ERROR", outputReader.readLine());
       assertNull(outputReader.readLine());
@@ -96,7 +108,7 @@ public class AppTest {
   @Test
   public void printErrorWithEmptyMessage() {
     // TODO: implement
-    main.App.printError("");
+    App.printError("");
     // TODO: assert "ERROR" in stdout and "" (or "\n") in stderr
   }
 
@@ -117,24 +129,37 @@ public class AppTest {
       testMessageCharArray[i] += charVal;
     }
     String testMessage = new String(testMessageCharArray);
-    main.App.printError(testMessage);
+    App.printError(testMessage);
     // TODO: assert "ERROR" in stdout and testMessage (or testMessage + "\n") in
     // stderr
+    
+    assertDoesNotThrow(() -> {
+      assertEquals("ERROR", outputReader.readLine());
+      assertNull(outputReader.readLine());
+      assertEquals("", errorReader.readLine());
+    });
   }
 
   // App.constructReader(String)
 
   @Test
   public void constructReaderForNullFilePrintsError() {
-    Object reader = main.App.constructReader(null);
+    Object reader = App.constructReader(null);
     // TODO: assert error message
+    
+    assertDoesNotThrow(() -> {
+      assertEquals("ERROR", outputReader.readLine());
+      assertNull(outputReader.readLine());
+      assertEquals("Null input file not allowed.", errorReader.readLine());
+    });
 
     assertNull(reader);
   }
 
   @Test
   public void constructReaderForNonexistentFilePrintsError() {
-    Object reader = main.App.constructReader("file-does-not-exist.txt");
+    String fileName = getMainFilePath("file-does-not-exist.txt");
+    Object reader = App.constructReader(fileName);
     // TODO: assert error message
 
     assertNull(reader);
@@ -142,7 +167,8 @@ public class AppTest {
 
   @Test
   public void constructReaderForDirectoryPrintsError() {
-    Object reader = main.App.constructReader("empty_dir");
+    String fileName = getMainFilePath("empty_dir");
+    Object reader = App.constructReader(fileName);
     // TODO: assert error message
 
     assertNull(reader);
@@ -150,8 +176,8 @@ public class AppTest {
 
   @Test
   public void constructReaderForReadableFileReturnsReader() {
-    String fileName = "empty_file.txt";
-    final BufferedReader reader = main.App.constructReader(fileName);
+    String fileName = getMainFilePath("empty_file.txt");
+    final BufferedReader reader = App.constructReader(fileName);
     assertNotNull(reader);
     assertDoesNotThrow(() -> {
       reader.close();
@@ -162,12 +188,12 @@ public class AppTest {
 
   @Test
   public void readStationsSectionForEmptyFilePrintsError() {
-    String fileName = "empty_file.txt";
+    String fileName = getMainFilePath("empty_file.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
-      Object map = main.App.readStationsSection(reader);
+      Object map = App.readStationsSection(reader);
       // TODO: assert error message
 
       assertNull(map);
@@ -179,12 +205,12 @@ public class AppTest {
   public void readStationsSectionForFileWithoutHeadersPrintsError() {
     // TODO: implement
 
-    String fileName = "file_without_headers.txt";
+    String fileName = getMainFilePath("file_without_headers.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
-      Object map = main.App.readStationsSection(reader);
+      Object map = App.readStationsSection(reader);
       // TODO: assert error message
 
       assertNull(map);
@@ -196,12 +222,12 @@ public class AppTest {
   public void readStationsSectionForFileWithoutStationsSectionPrintsError() {
     // TODO: implement
 
-    String fileName = "file_without_stations_section.txt";
+    String fileName = getMainFilePath("file_without_stations_section.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
-      Object map = main.App.readStationsSection(reader);
+      Object map = App.readStationsSection(reader);
       // TODO: assert error message
 
       assertNull(map);
@@ -213,12 +239,12 @@ public class AppTest {
   public void readStationsSectionForFileWithoutNewlineSeparationPrintsError() {
     // TODO: implement
 
-    String fileName = "file_without_newline_separation.txt";
+    String fileName = getMainFilePath("file_without_newline_separation.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
-      Object map = main.App.readStationsSection(reader);
+      Object map = App.readStationsSection(reader);
       // TODO: assert error message
 
       assertNull(map);
@@ -230,12 +256,12 @@ public class AppTest {
   public void readStationsSectionForFileWithNonNumberStationIDsPrintsError() {
     // TODO: implement
 
-    String fileName = "file_with_non_number_station_ids.txt";
+    String fileName = getMainFilePath("file_with_non_number_station_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
-      Object map = main.App.readStationsSection(reader);
+      Object map = App.readStationsSection(reader);
       // TODO: assert error message
 
       assertNull(map);
@@ -247,12 +273,12 @@ public class AppTest {
   public void readStationsSectionForFileWithNonNumberChargerIDsPrintsError() {
     // TODO: implement
 
-    String fileName = "file_with_non_number_charger_ids.txt";
+    String fileName = getMainFilePath("file_with_non_number_charger_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
-      Object map = main.App.readStationsSection(reader);
+      Object map = App.readStationsSection(reader);
       // TODO: assert error message
 
       assertNull(map);
@@ -264,12 +290,12 @@ public class AppTest {
   public void readStationsSectionForFileWithNegativeStationIDsPrintsError() {
     // TODO: implement
 
-    String fileName = "file_with_negative_station_ids.txt";
+    String fileName = getMainFilePath("file_with_negative_station_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
-      Object map = main.App.readStationsSection(reader);
+      Object map = App.readStationsSection(reader);
       // TODO: assert error message
 
       assertNull(map);
@@ -281,12 +307,12 @@ public class AppTest {
   public void readStationsSectionForFileWithNegativeChargerIDsPrintsError() {
     // TODO: implement
 
-    String fileName = "file_with_negative_charger_ids.txt";
+    String fileName = getMainFilePath("file_with_negative_charger_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
-      Object map = main.App.readStationsSection(reader);
+      Object map = App.readStationsSection(reader);
       // TODO: assert error message
 
       assertNull(map);
@@ -321,72 +347,72 @@ public class AppTest {
 
   public void computeStationUptimeClearsReportList() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new main.App.Report(0, 2, true));
-    reportList.add(new main.App.Report(5, 6, false));
-    main.App.computeStationUptime(reportList);
+    reportList.add(new Report(0, 2, true));
+    reportList.add(new Report(5, 6, false));
+    App.computeStationUptime(reportList);
     assertTrue(reportList.isEmpty());
   }
 
   public void computeStationUptimeReturnsZeroOnEmptyList() {
     List<Report> reportList = new ArrayList<>();
-    int output = main.App.computeStationUptime(reportList);
+    int output = App.computeStationUptime(reportList);
     assertEquals(0, output);
   }
 
   public void computeStationUptimeReturnsZeroOnNoUptime() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new main.App.Report(0, 100, false));
-    int output = main.App.computeStationUptime(reportList);
+    reportList.add(new Report(0, 100, false));
+    int output = App.computeStationUptime(reportList);
     assertEquals(0, output);
   }
 
   public void computeStationUptimeReportsIgnoresOverlappingDowntime() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new main.App.Report(0, 7, true));
-    reportList.add(new main.App.Report(3, 4, false));
-    reportList.add(new main.App.Report(6, 10, false));
-    int output = main.App.computeStationUptime(reportList);
+    reportList.add(new Report(0, 7, true));
+    reportList.add(new Report(3, 4, false));
+    reportList.add(new Report(6, 10, false));
+    int output = App.computeStationUptime(reportList);
     assertEquals(100, output);
   }
 
   public void computeStationUptimeReportsMergesOverlappingUptime() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new main.App.Report(0, 7, true));
-    reportList.add(new main.App.Report(3, 4, true));
-    reportList.add(new main.App.Report(6, 10, true));
-    int output = main.App.computeStationUptime(reportList);
+    reportList.add(new Report(0, 7, true));
+    reportList.add(new Report(3, 4, true));
+    reportList.add(new Report(6, 10, true));
+    int output = App.computeStationUptime(reportList);
     assertEquals(100, output);
   }
 
   public void computeStationUptimeCountsUnreportedTimeBetweenReportsAsDowntime() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new main.App.Report(0, 4, true));
-    reportList.add(new main.App.Report(5, 6, false));
-    reportList.add(new main.App.Report(9, 10, true));
-    int output = main.App.computeStationUptime(reportList);
+    reportList.add(new Report(0, 4, true));
+    reportList.add(new Report(5, 6, false));
+    reportList.add(new Report(9, 10, true));
+    int output = App.computeStationUptime(reportList);
     assertEquals(50, output);
   }
 
   public void computeStationUptimeIgnoresUnreportedTimeBeforeFirstStart() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new main.App.Report(1, 2, true));
-    reportList.add(new main.App.Report(2, 3, false));
-    int output = main.App.computeStationUptime(reportList);
+    reportList.add(new Report(1, 2, true));
+    reportList.add(new Report(2, 3, false));
+    int output = App.computeStationUptime(reportList);
     assertEquals(50, output);
   }
 
   public void computeStationUptimeTruncatesOutput() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new main.App.Report(0, 2, true));
-    reportList.add(new main.App.Report(2, 3, false));
-    int output = main.App.computeStationUptime(reportList);
+    reportList.add(new Report(0, 2, true));
+    reportList.add(new Report(2, 3, false));
+    int output = App.computeStationUptime(reportList);
     assertEquals(66, output);
   }
 
   public void computeStationUptimeHandlesLargeUnsignedLong() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new main.App.Report(0, Long.MAX_VALUE + 1, true));
-    int output = main.App.computeStationUptime(reportList);
+    reportList.add(new Report(0, Long.MAX_VALUE + 1, true));
+    int output = App.computeStationUptime(reportList);
     assertEquals(100, output);
   }
 
