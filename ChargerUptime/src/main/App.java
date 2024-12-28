@@ -1,3 +1,5 @@
+package main;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,11 +18,19 @@ import java.util.Map.Entry;
  * @author Kevin Li
  */
 public class App {
-  static class Report implements Comparable<Report> {
+  public static class Report implements Comparable<Report> {
     long startTime, endTime; // unsigned long
     boolean up;
 
-    Report(long startTime, long endTime, boolean up) {
+    /**
+     * Create a new Report object. It is assumed that endTime is larger than
+     * startTime, in unsigned longs.
+     *
+     * @param startTime the starting time, in nanoseconds
+     * @param endTime   the ending time, in nanoseconds
+     * @param up        true if uptime, false if downtime
+     */
+    public Report(long startTime, long endTime, boolean up) {
       this.startTime = startTime;
       this.endTime = endTime;
       this.up = up;
@@ -29,7 +39,8 @@ public class App {
     @Override
     public int compareTo(Report other) {
       // Will help when merging overlapping uptime reports
-      return startTime == other.startTime ? Long.compareUnsigned(endTime, other.endTime) : Long.compareUnsigned(startTime, other.startTime);
+      return startTime == other.startTime ? Long.compareUnsigned(endTime, other.endTime)
+          : Long.compareUnsigned(startTime, other.startTime);
     }
   }
 
@@ -40,9 +51,10 @@ public class App {
    *
    * @param message the error message
    */
-  static void printError(String message) {
+  public static void printError(String message) {
     System.out.println("ERROR");
-    System.err.println(message); // TODO: ensure stderr, not stdout
+    if (message != null)
+      System.err.println(message); // TODO: ensure stderr, not stdout
     return;
   }
 
@@ -53,7 +65,7 @@ public class App {
    * @param relativePath the file path
    * @return the BufferedReader, or null if file not found
    */
-  static BufferedReader constructReader(String relativePath) {
+  public static BufferedReader constructReader(String relativePath) {
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new FileReader(relativePath));
@@ -71,7 +83,7 @@ public class App {
    * @param reader the BufferedReader for the given file
    * @return a map of each charger ID to its station ID
    */
-  static HashMap<Integer, Integer> readStationsSection(BufferedReader reader) {
+  public static HashMap<Integer, Integer> readStationsSection(BufferedReader reader) {
     try {
       if (!reader.readLine().equals("[Stations]")) {
         printError("Input file is formatted incorrectly.");
@@ -115,7 +127,7 @@ public class App {
    * @param stationMap a map of each charger ID to its station ID
    * @return a map of each station ID to its reported time intervals
    */
-  static HashMap<Integer, List<Report>> readChargerAvailabilityReportsSection(BufferedReader reader,
+  public static HashMap<Integer, List<Report>> readChargerAvailabilityReportsSection(BufferedReader reader,
       HashMap<Integer, Integer> stationMap) {
     try {
       if (!reader.readLine().equals("[Charger Availability Reports]")) {
@@ -184,12 +196,13 @@ public class App {
   }
 
   /**
-   * Compute the uptimes for the station given its reported time intervals.
+   * Compute the uptimes for the station given its reported time intervals. The
+   * list of reports is cleared after the function call to free memory storage.
    *
    * @param stationTimeReports a list of the station's reported time intervals
    * @return the station uptime, as a truncated percentage
    */
-  static int computeStationUptime(List<Report> stationTimeReports) {
+  public static int computeStationUptime(List<Report> stationTimeReports) {
     if (stationTimeReports.isEmpty())
       return 0; // no reported time
 
@@ -234,6 +247,7 @@ public class App {
     long uptime = 0;
     for (Report report : stationTimeReports)
       uptime += report.endTime - report.startTime;
+    stationTimeReports.clear();
 
     // TODO: will below work with unsigned?
     return (int) (100 * (1.0 * uptime / totalTime)); // prevent long integer overflow
@@ -248,7 +262,7 @@ public class App {
    * @return the station uptimes, where the first entry of each nested array
    *         represents the station ID and the second represents the uptime
    */
-  static int[][] computeStationUptimes(HashMap<Integer, List<Report>> stationReportsMap) {
+  public static int[][] computeStationUptimes(HashMap<Integer, List<Report>> stationReportsMap) {
     int[][] output = new int[stationReportsMap.size()][2];
     int outputIndex = 0;
     for (Entry<Integer, List<Report>> station : stationReportsMap.entrySet()) {
@@ -259,13 +273,13 @@ public class App {
   }
 
   /**
-   * Print the uptimes for each station. The method assumes that the stations
-   * are sorted in ascending order, each containing the station ID and its
-   * uptime, in that order.
+   * Print the uptimes for each station. The method assumes that the station
+   * uptimes are non-null and sorted in ascending order, each containing the
+   * station ID and its uptime, in that order.
    *
    * @param stationUptimes the station uptimes
    */
-  static void printStationUptimes(int[][] stationUptimes) {
+  public static void printStationUptimes(int[][] stationUptimes) {
     for (int[] station : stationUptimes)
       System.out.printf("%d %d\n", station[0], station[1]);
     return;
