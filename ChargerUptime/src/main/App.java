@@ -66,6 +66,10 @@ public class App {
    * @return the BufferedReader, or null if file not found
    */
   public static BufferedReader constructReader(String relativePath) {
+    if (relativePath == null) {
+      printError("Null input file not allowed.");
+      return null;
+    }
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new FileReader(relativePath));
