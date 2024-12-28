@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -213,9 +214,9 @@ public class App {
     // Get station's total reported time
     long start = Long.MAX_VALUE, end = 0;
     for (Report report : stationTimeReports) {
-      if (report.startTime < start)
+      if (Long.compareUnsigned(report.startTime, start) < 0)
         start = report.startTime;
-      if (report.endTime > end)
+      if (Long.compareUnsigned(report.endTime, end) > 0)
         end = report.endTime;
     }
     long totalTime = end - start;
@@ -236,10 +237,13 @@ public class App {
     for (int i = 1; i < uptimeReports.size(); i++) {
       // Due to natural ordering, each subsequent report is guaranteed to
       // start no earlier than previous reports.
-      // We just need to check if the start of the current report overlaps
-      // with the end of the last report.
+      // We just need to skip any reports that end before the last report and
+      // check if the start of the current report overlaps with the end of the
+      // last report.
       Report thisReport = uptimeReports.get(i);
-      if (thisReport.startTime <= lastReport.endTime)
+      if (thisReport.endTime < lastReport.endTime)
+        continue;
+      else if (thisReport.startTime <= lastReport.endTime)
         lastReport.endTime = thisReport.endTime;
       else {
         stationTimeReports.add(thisReport);
@@ -253,8 +257,13 @@ public class App {
       uptime += report.endTime - report.startTime;
     stationTimeReports.clear();
 
-    // TODO: will below work with unsigned?
-    return (int) (100 * (1.0 * uptime / totalTime)); // prevent long integer overflow
+    // Since we're using unsigned long values for times, we need unsigned
+    // string and BigInteger to prevent overflow.
+    String uptimeString = Long.toUnsignedString(uptime);
+    String totalTimeString = Long.toUnsignedString(totalTime);
+    BigInteger numerator = new BigInteger(uptimeString + "00");
+    BigInteger denominator = new BigInteger(totalTimeString);
+    return numerator.divide(denominator).intValue();
   }
 
   /**

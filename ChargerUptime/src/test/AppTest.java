@@ -345,6 +345,7 @@ public class AppTest {
 
   // App.computeStationUptime(List<Report>)
 
+  @Test
   public void computeStationUptimeClearsReportList() {
     List<Report> reportList = new ArrayList<>();
     reportList.add(new Report(0, 2, true));
@@ -353,12 +354,14 @@ public class AppTest {
     assertTrue(reportList.isEmpty());
   }
 
+  @Test
   public void computeStationUptimeReturnsZeroOnEmptyList() {
     List<Report> reportList = new ArrayList<>();
     int output = App.computeStationUptime(reportList);
     assertEquals(0, output);
   }
 
+  @Test
   public void computeStationUptimeReturnsZeroOnNoUptime() {
     List<Report> reportList = new ArrayList<>();
     reportList.add(new Report(0, 100, false));
@@ -366,16 +369,18 @@ public class AppTest {
     assertEquals(0, output);
   }
 
-  public void computeStationUptimeReportsIgnoresOverlappingDowntime() {
+  @Test
+  public void computeStationUptimeIgnoresOverlappingDowntime() {
     List<Report> reportList = new ArrayList<>();
     reportList.add(new Report(0, 7, true));
     reportList.add(new Report(3, 4, false));
     reportList.add(new Report(6, 10, false));
     int output = App.computeStationUptime(reportList);
-    assertEquals(100, output);
+    assertEquals(70, output);
   }
 
-  public void computeStationUptimeReportsMergesOverlappingUptime() {
+  @Test
+  public void computeStationUptimeMergesOverlappingUptime() {
     List<Report> reportList = new ArrayList<>();
     reportList.add(new Report(0, 7, true));
     reportList.add(new Report(3, 4, true));
@@ -384,6 +389,18 @@ public class AppTest {
     assertEquals(100, output);
   }
 
+  @Test
+  public void computeStationUptimeHandlesUnsortedReports() {
+    List<Report> reportList = new ArrayList<>();
+    reportList.add(new Report(2, 10, true));
+    reportList.add(new Report(0, 2, false));
+    reportList.add(new Report(16, 20, true));
+    reportList.add(new Report(10, 16, false));
+    int output = App.computeStationUptime(reportList);
+    assertEquals(60, output);
+  }
+
+  @Test
   public void computeStationUptimeCountsUnreportedTimeBetweenReportsAsDowntime() {
     List<Report> reportList = new ArrayList<>();
     reportList.add(new Report(0, 4, true));
@@ -393,6 +410,7 @@ public class AppTest {
     assertEquals(50, output);
   }
 
+  @Test
   public void computeStationUptimeIgnoresUnreportedTimeBeforeFirstStart() {
     List<Report> reportList = new ArrayList<>();
     reportList.add(new Report(1, 2, true));
@@ -401,6 +419,7 @@ public class AppTest {
     assertEquals(50, output);
   }
 
+  @Test
   public void computeStationUptimeTruncatesOutput() {
     List<Report> reportList = new ArrayList<>();
     reportList.add(new Report(0, 2, true));
@@ -409,14 +428,23 @@ public class AppTest {
     assertEquals(66, output);
   }
 
-  public void computeStationUptimeHandlesLargeUnsignedLong() {
+  @Test
+  public void computeStationUptimeHandlesLargeUnsignedLongTotalTime() {
     List<Report> reportList = new ArrayList<>();
-    reportList.add(new Report(0, Long.MAX_VALUE + 1, true));
+    reportList.add(new Report(0, Long.MIN_VALUE >>> 1, true));
+    reportList.add(new Report(Long.MIN_VALUE >>> 1, Long.MIN_VALUE, false));
     int output = App.computeStationUptime(reportList);
-    assertEquals(100, output);
+    assertEquals(50, output);
   }
 
-  // TODO: methods
+  @Test
+  public void computeStationUptimeHandlesLargeUnsignedLongUptime() {
+    List<Report> reportList = new ArrayList<>();
+    reportList.add(new Report(0, Long.MIN_VALUE, true));
+    reportList.add(new Report(Long.MIN_VALUE, -1, false));
+    int output = App.computeStationUptime(reportList);
+    assertEquals(50, output);
+  }
 
   // App.computeStationUptimes(HashMap<Integer, List<Report>>)
 
