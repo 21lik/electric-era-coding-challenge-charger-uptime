@@ -3,7 +3,7 @@
 Last updated: Dec 31, 2024
 
 This program was written in Java 21 by Kevin Li for the Electric Era Coding Challenge, found here:
-https://gitlab.com/electric-era-public/coding-challenge-charger-uptime.
+https://gitlab.com/electric-era-public/coding-challenge-charger-uptime. A private GitHub repository was used for version control.
 
 This program was submitted on December 31, 2024. Thank you again Electric Era for considering me for your position, and I hope you have a Merry Christmas and a Happy New Year!
 
