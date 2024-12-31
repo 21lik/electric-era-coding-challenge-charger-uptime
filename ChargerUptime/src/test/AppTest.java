@@ -4,30 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.platform.launcher.TestExecutionListener;
 
 import main.App;
 import main.App.Report;
@@ -40,7 +25,8 @@ public class AppTest {
    * subdirectory. Set to <code>true</code> if the latter, <code>false</code>
    * if the former. This is important for setting the correct relative file
    * path for the text files used for the unit tests below.
-   * <br></br>
+   * <br>
+   * </br>
    * It is assumed that the tester will not attempt to run AppTest from a
    * different directory (e.g.
    * <code>electric-era-coding-challenge-charger-uptime/ChargerUptime/</code> or
@@ -233,7 +219,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
@@ -255,7 +242,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
@@ -277,7 +265,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
@@ -299,7 +288,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
 
       Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
@@ -317,7 +307,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
@@ -339,7 +330,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(-1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(-1002), Integer.valueOf(0));
@@ -361,7 +353,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
@@ -383,7 +376,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       int offset = (int) 10000000001000l;
       stationsMap.put(Integer.valueOf(offset + 1), Integer.valueOf(0));
@@ -406,7 +400,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
@@ -428,7 +423,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section, but leave stations map empty
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
 
       Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
@@ -467,7 +463,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
@@ -514,7 +511,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       int stationOffset = (int) 2147483648l;
       int chargerOffset = (int) 3000001000l;
@@ -563,7 +561,8 @@ public class AppTest {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
 
       // Simulate reading Stations section and getting stations map
-      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
       stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
       stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
