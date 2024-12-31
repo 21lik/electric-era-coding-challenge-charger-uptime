@@ -61,6 +61,19 @@ public class AppTest {
   }
 
   @Test
+  public void testReadStationsSectionForFileWithEmptySectionsReturnsEmptyMap() {
+    String fileName = getRelativeFilePath("file_with_empty_sections.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      HashMap<Integer, Integer> map = App.readStationsSection(reader);
+      reader.close();
+      assertNotNull(map);
+      assertTrue(map.isEmpty());
+    });
+  }
+
+  @Test
   public void testReadStationsSectionForFileWithoutHeadersReturnsNull() {
     String fileName = getRelativeFilePath("file_without_headers.txt");
 
@@ -222,15 +235,29 @@ public class AppTest {
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
         ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
-      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
-      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
-      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
-      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
       Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
-      stationsMap.clear();
       reader.close();
       assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithEmptySectionsReturnsEmptyMap() {
+    String fileName = getRelativeFilePath("file_with_empty_sections.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      reader.close();
+      assertNotNull(map);
+      assertTrue(map.isEmpty());
     });
   }
 
@@ -428,7 +455,6 @@ public class AppTest {
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
 
       Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
-      stationsMap.clear();
       reader.close();
       assertNull(map);
     });
@@ -742,6 +768,10 @@ public class AppTest {
     map.put(Integer.valueOf(1), list1);
     map.put(Integer.valueOf(4), list4);
     int[][] output = App.computeStationUptimes(map);
+    list1.clear();
+    list4.clear();
+    list5.clear();
+    map.clear();
     assertNotNull(output);
     assertEquals(1, output[0][0]);
     assertEquals(100, output[0][1]);
