@@ -24,9 +24,10 @@ public class App {
     boolean up;
 
     /**
-     * Create a new Report object. It is assumed that endTime is larger than
-     * startTime, in unsigned longs, and no report is reused for multiple
-     * stations.
+     * Create a new Report object. It is assumed that <code>endTime</code> is
+     * larger than <code>startTime</code>, in unsigned longs; that is,
+     * <code>Long.compareUnsigned(endTime, startTime) > 0</code>; and no report
+     * is reused for multiple stations.
      *
      * @param startTime the starting time, in nanoseconds
      * @param endTime   the ending time, in nanoseconds
@@ -39,6 +40,14 @@ public class App {
     }
 
     @Override
+    public boolean equals(Object other) {
+      if (other == null || !(other instanceof Report))
+        return false;
+      Report otherReport = (Report) other;
+      return (startTime == otherReport.startTime) && (endTime == otherReport.endTime) && (up == otherReport.up);
+    }
+
+    @Override
     public int compareTo(Report other) {
       // Will help when merging overlapping uptime reports
       return startTime == other.startTime ? Long.compareUnsigned(endTime, other.endTime)
@@ -47,52 +56,19 @@ public class App {
   }
 
   /**
-   * Print "ERROR" in `stdout` and the respective message in `stderr`. This
-   * method should be called after any error, and the program should exit after
-   * calling this method.
-   *
-   * @param message the error message
-   */
-  public static void printError(String message) {
-    System.out.println("ERROR");
-    if (message != null)
-      System.err.println(message); // TODO: ensure stderr, not stdout
-    return;
-  }
-
-  /**
-   * Construct a BufferedReader object for the file given in the relative path.
-   * Prints an error and returns `null` if the file path is invalid.
-   *
-   * @param relativePath the file path
-   * @return the BufferedReader, or null if file not found
-   */
-  public static BufferedReader constructReader(String relativePath) {
-    if (relativePath == null) {
-      printError("Null input file not allowed.");
-      return null;
-    }
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader(relativePath));
-    } catch (FileNotFoundException e) {
-      printError("Input file " + relativePath + " not found.");
-    }
-    return reader;
-  }
-
-  /**
    * Read and process the Stations section of the file, mapping each charger to
-   * its respective station. Prints an error and returns `null` if the file
-   * format is invalid.
+   * its respective station. Prints an error and returns <code>null</code> if
+   * the file format is invalid.
    *
    * @param reader the BufferedReader for the given file
    * @return a map of each charger ID to its station ID
    */
   public static HashMap<Integer, Integer> readStationsSection(BufferedReader reader) {
     try {
-      if (!reader.readLine().equals("[Stations]")) {
-        printError("Input file is formatted incorrectly.");
+      String nextLine = reader.readLine();
+      if (nextLine == null || !nextLine.equals("[Stations]")) {
+        System.out.println("ERROR");
+        System.err.println("Input file is formatted incorrectly.");
         reader.close();
         return null;
       }
@@ -100,7 +76,7 @@ public class App {
       HashMap<Integer, Integer> output = new HashMap<>(); // charger -> station
 
       // Read each line
-      for (String nextLine = reader.readLine(); !nextLine.isBlank(); nextLine = reader.readLine()) {
+      for (nextLine = reader.readLine(); !nextLine.isBlank(); nextLine = reader.readLine()) {
         String[] tokens = nextLine.split(" ");
         try {
           Integer stationId = Integer.valueOf(Integer.parseUnsignedInt(tokens[0]));
@@ -108,8 +84,8 @@ public class App {
             output.put(Integer.valueOf(Integer.parseUnsignedInt(tokens[i])), stationId);
           }
         } catch (NumberFormatException e) {
-          printError("Station and charger IDs must be unsigned 32-bit integers.");
-          // TODO: make sure above works with unsigned (2,147,483,648 or larger)
+          System.out.println("ERROR");
+          System.err.println("Station and charger IDs must be unsigned 32-bit integers.");
           reader.close();
           output.clear();
           return null;
@@ -118,7 +94,8 @@ public class App {
 
       return output;
     } catch (IOException e) {
-      printError("File cannot be read.");
+      System.out.println("ERROR");
+      System.err.println("File cannot be read.");
       return null;
     }
   }
@@ -126,7 +103,8 @@ public class App {
   /**
    * Read and process the Charger Availability Reports section of the file,
    * mapping each station to its reported uptime/downtime intervals. Prints an
-   * error and returns `null` if the file format is invalid.
+   * error and returns <code>null</code> if the file format is invalid. It is
+   * assumed that <code>stationMap</code> is not <code>null</code>.
    *
    * @param reader     the BufferedReader for the given file
    * @param stationMap a map of each charger ID to its station ID
@@ -135,8 +113,10 @@ public class App {
   public static HashMap<Integer, List<Report>> readChargerAvailabilityReportsSection(BufferedReader reader,
       HashMap<Integer, Integer> stationMap) {
     try {
-      if (!reader.readLine().equals("[Charger Availability Reports]")) {
-        printError("Input file is formatted incorrectly.");
+      String nextLine = reader.readLine();
+      if (nextLine == null || !nextLine.equals("[Charger Availability Reports]")) {
+        System.out.println("ERROR");
+        System.err.println("Input file is formatted incorrectly.");
         reader.close();
         return null;
       }
@@ -144,7 +124,7 @@ public class App {
       HashMap<Integer, List<Report>> output = new HashMap<>();
 
       // Read each line
-      for (String nextLine = reader.readLine(); nextLine != null; nextLine = reader.readLine()) {
+      for (nextLine = reader.readLine(); nextLine != null; nextLine = reader.readLine()) {
         String[] tokens = nextLine.split(" ");
 
         // Get the charger ID
@@ -152,8 +132,8 @@ public class App {
         try {
           chargerId = Integer.valueOf(Integer.parseUnsignedInt(tokens[0]));
         } catch (NumberFormatException e) {
-          printError("Charger IDs must be unsigned 32-bit integers.");
-          // TODO: make sure above works with unsigned (2,147,483,648 or larger)
+          System.out.println("ERROR");
+          System.err.println("Charger IDs must be unsigned 32-bit integers.");
           reader.close();
           output.clear();
           return null;
@@ -162,7 +142,8 @@ public class App {
         // Get the charger's station ID
         Integer stationId = stationMap.get(chargerId);
         if (stationId == null) {
-          printError("Each charger must be present at a station.");
+          System.out.println("ERROR");
+          System.err.println("Each charger must be present at a station.");
           reader.close();
           output.clear();
           return null;
@@ -183,7 +164,8 @@ public class App {
           startTime = Long.parseUnsignedLong(tokens[1]);
           endTime = Long.parseUnsignedLong(tokens[2]);
         } catch (NumberFormatException e) {
-          printError("Start and end times must be unsigned 64-bit integers");
+          System.out.println("ERROR");
+          System.err.println("Start and end times must be unsigned 64-bit integers");
           reader.close();
           output.clear();
           return null;
@@ -195,7 +177,8 @@ public class App {
 
       return output;
     } catch (IOException e) {
-      printError("File cannot be read.");
+      System.out.println("ERROR");
+      System.err.println("File cannot be read.");
       return null;
     }
   }
@@ -268,8 +251,8 @@ public class App {
 
   /**
    * Compute the uptimes for the stations, given the reported time intervals of
-   * their respective chargers. It is assumed that `stationReportsMap` is not
-   * null.
+   * their respective chargers. It is assumed that
+   * <code>stationReportsMap</code> is not null.
    *
    * @param stationReportsMap a map of each station ID to its reported time
    *                          intervals
@@ -301,13 +284,19 @@ public class App {
 
   public static void main(String[] args) {
     if (args.length != 1) {
-      printError("Please enter exactly one argument.");
+      System.out.println("ERROR");
+      System.err.println("Please enter exactly one argument.");
       return;
     }
 
-    BufferedReader reader = constructReader(args[0]);
-    if (reader == null)
-      return; // Error in constructing reader for file
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(args[0]));
+    } catch (FileNotFoundException e) {
+      System.out.println("ERROR");
+      System.err.println("Input file " + args[0] + " not found.");
+      return;
+    }
 
     HashMap<Integer, Integer> stationsMap = readStationsSection(reader);
     if (stationsMap == null)
@@ -323,7 +312,8 @@ public class App {
     try {
       reader.close();
     } catch (IOException e) {
-      printError("Closing reader failed.");
+      System.out.println("ERROR");
+      System.err.println("Closing reader failed.");
       stationReportsMap.clear();
       return;
     }

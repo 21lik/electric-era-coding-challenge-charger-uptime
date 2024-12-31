@@ -1,0 +1,12 @@
+[Stations]
+0 1001 1002
+1 1003
+2 1004
+
+[Charger Availability Reports]
+1001 a c true
+1001 c e true
+1002 c e true
+1003 b d false
+1004 a c true
+1004 e f true

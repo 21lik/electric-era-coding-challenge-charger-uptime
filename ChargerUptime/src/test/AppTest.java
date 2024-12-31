@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,329 +33,576 @@ import main.App;
 import main.App.Report;
 
 public class AppTest {
-  public static final PrintStream STDOUT = System.out;
-  public static final PrintStream STDERR = System.err;
-
-  public static final File OUTPUT_FILE = new File("stdout_file.txt");
-  public static final File ERROR_FILE = new File("stderr_file.txt");
-
-  private static PrintStream outputStream;
-  private static PrintStream errorStream;
-
-  private BufferedReader outputReader;
-  private BufferedReader errorReader;
+  /**
+   * Boolean constant denoting whether AppTest is being run from the
+   * <code>electric-era-coding-challenge-charger-uptime/</code> directory or the
+   * <code>electric-era-coding-challenge-charger-uptime/ChargerUptime/src/</code>
+   * subdirectory. Set to <code>true</code> if the latter, <code>false</code>
+   * if the former. This is important for setting the correct relative file
+   * path for the text files used for the unit tests below.
+   * <br></br>
+   * It is assumed that the tester will not attempt to run AppTest from a
+   * different directory (e.g.
+   * <code>electric-era-coding-challenge-charger-uptime/ChargerUptime/</code> or
+   * <code>electric-era-coding-challenge-charger-uptime/ChargerUptime/src/test/</code>).
+   */
+  public static final boolean RUNNING_FROM_SRC_SUBDIRECTORY = false;
 
   /**
-   * Modify the relative file path from the test directory into a relative file
-   * path from the main directory to the same file. This is needed to test
-   * `App.constructReader(String)`, which is located in the main package.
+   * Get the relative path for the file with the given name, depending on where
+   * the tester is running AppTest. See the documentation for
+   * <code>RUNNING_FROM_SRC_SUBDIRECTORY</code> for the two possible locations.
    *
-   * @param testFilePath the relative file path from `src/test`
-   * @return the relative file path from `src/main`
+   * @param fileName the name of the file
+   * @return the relative file path
    */
-  private static String getMainFilePath(String testFilePath) {
-    return "../test/" + testFilePath;
-  }
-
-  @BeforeAll
-  public static void switchStreams() throws FileNotFoundException {
-    outputStream = new PrintStream(OUTPUT_FILE);
-    errorStream = new PrintStream(ERROR_FILE);
-    System.setOut(outputStream);
-    System.setErr(errorStream);
-  }
-
-  @BeforeEach
-  public void testConstructStreamReaders() throws FileNotFoundException {
-    outputReader = new BufferedReader(new FileReader(OUTPUT_FILE));
-    errorReader = new BufferedReader(new FileReader(ERROR_FILE));
-  }
-
-  @AfterEach
-  public void testCloseReadersAndClearFiles() throws IOException {
-    // Close readers
-    outputReader.close();
-    errorReader.close();
-
-    // Clear files by using PrintWriter and writing an empty string
-    PrintWriter writer = new PrintWriter(OUTPUT_FILE);
-    writer.write("");
-    writer.close();
-    writer = new PrintWriter(ERROR_FILE);
-    writer.write("");
-    writer.close();
-  }
-
-  @AfterAll
-  public static void closeAndResetStreams() {
-    outputStream.close();
-    errorStream.close();
-
-    System.setOut(STDOUT);
-    System.setErr(STDERR);
-  }
-
-  // App.printError(String)
-
-  @Test
-  public void testPrintErrorWithNullMessage() {
-    App.printError(null);
-    assertDoesNotThrow(() -> {
-      assertEquals("ERROR", outputReader.readLine());
-      assertNull(outputReader.readLine());
-      assertNull(errorReader.readLine());
-    });
-  }
-
-  @Test
-  public void testPrintErrorWithEmptyMessage() {
-    // TODO: implement
-    App.printError("");
-    // TODO: assert "ERROR" in stdout and "" (or "\n") in stderr
-  }
-
-  @Test
-  public void testPrintErrorWithMessage() {
-    // TODO: implement
-    int testMessageLength = (int) (Math.random() * 256);
-    char[] testMessageCharArray = new char[testMessageLength];
-    for (int i = 0; i < testMessageLength; i++) {
-      // Generate random alphanumeral character
-      char charVal = (char) (Math.random() * 62);
-      if (charVal < 10)
-        charVal += '0';
-      else if (charVal < 36)
-        charVal += 'A' - 10;
-      else
-        charVal += 'a' - 36;
-      testMessageCharArray[i] += charVal;
-    }
-    String testMessage = new String(testMessageCharArray);
-    App.printError(testMessage);
-    // TODO: assert "ERROR" in stdout and testMessage (or testMessage + "\n") in
-    // stderr
-    
-    assertDoesNotThrow(() -> {
-      assertEquals("ERROR", outputReader.readLine());
-      assertNull(outputReader.readLine());
-      assertEquals("", errorReader.readLine());
-    });
-  }
-
-  // App.constructReader(String)
-
-  @Test
-  public void testConstructReaderForNullFilePrintsError() {
-    Object reader = App.constructReader(null);
-    // TODO: assert error message
-    
-    assertDoesNotThrow(() -> {
-      assertEquals("ERROR", outputReader.readLine());
-      assertNull(outputReader.readLine());
-      assertEquals("Null input file not allowed.", errorReader.readLine());
-    });
-
-    assertNull(reader);
-  }
-
-  @Test
-  public void testConstructReaderForNonexistentFilePrintsError() {
-    String fileName = getMainFilePath("file-does-not-exist.txt");
-    Object reader = App.constructReader(fileName);
-    // TODO: assert error message
-
-    assertNull(reader);
-  }
-
-  @Test
-  public void testConstructReaderForDirectoryPrintsError() {
-    String fileName = getMainFilePath("empty_dir");
-    Object reader = App.constructReader(fileName);
-    // TODO: assert error message
-
-    assertNull(reader);
-  }
-
-  @Test
-  public void testConstructReaderForReadableFileReturnsReader() {
-    String fileName = getMainFilePath("empty_file.txt");
-    final BufferedReader reader = App.constructReader(fileName);
-    assertNotNull(reader);
-    assertDoesNotThrow(() -> {
-      reader.close();
-    });
+  String getRelativeFilePath(String fileName) {
+    return RUNNING_FROM_SRC_SUBDIRECTORY ? "test/" + fileName : "ChargerUptime/src/test/" + fileName;
   }
 
   // App.readStationsSection(BufferedReader)
 
   @Test
-  public void testReadStationsSectionForEmptyFilePrintsError() {
-    String fileName = getMainFilePath("empty_file.txt");
+  public void testReadStationsSectionForEmptyFileReturnsNull() {
+    String fileName = getRelativeFilePath("empty_file.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithoutHeadersPrintsError() {
-    // TODO: implement
-
-    String fileName = getMainFilePath("file_without_headers.txt");
+  public void testReadStationsSectionForFileWithoutHeadersReturnsNull() {
+    String fileName = getRelativeFilePath("file_without_headers.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithoutStationsSectionPrintsError() {
-    // TODO: implement
-
-    String fileName = getMainFilePath("file_without_stations_section.txt");
+  public void testReadStationsSectionForFileWithoutStationsSectionReturnsNull() {
+    String fileName = getRelativeFilePath("file_without_stations_section.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithoutNewlineSeparationPrintsError() {
-    // TODO: implement
-
-    String fileName = getMainFilePath("file_without_newline_separation.txt");
+  public void testReadStationsSectionForFileWithoutNewlineSeparationReturnsNull() {
+    String fileName = getRelativeFilePath("file_without_newline_separation.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithNonNumberStationIDsPrintsError() {
-    // TODO: implement
-
-    String fileName = getMainFilePath("file_with_non_number_station_ids.txt");
+  public void testReadStationsSectionForFileWithNonNumberStationIDsReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_non_number_station_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithNonNumberChargerIDsPrintsError() {
-    // TODO: implement
-
-    String fileName = getMainFilePath("file_with_non_number_charger_ids.txt");
+  public void testReadStationsSectionForFileWithNonNumberChargerIDsReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_non_number_charger_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithNegativeStationIDsPrintsError() {
-    // TODO: implement
-
-    String fileName = getMainFilePath("file_with_negative_station_ids.txt");
+  public void testReadStationsSectionForFileWithNegativeStationIDsReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_negative_station_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithNegativeChargerIDsPrintsError() {
-    // TODO: implement
-
-    String fileName = getMainFilePath("file_with_negative_charger_ids.txt");
+  public void testReadStationsSectionForFileWithNegativeChargerIDsReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_negative_charger_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithLongStationIDsPrintsError() {
-    // TODO: implement
-
-
-    String fileName = getMainFilePath("file_with  .txt");
+  public void testReadStationsSectionForFileWithLongStationIDsReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_long_station_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
       Object map = App.readStationsSection(reader);
-      // TODO: assert error message
-
-      assertNull(map);
       reader.close();
+      assertNull(map);
     });
   }
 
   @Test
   public void testReadStationsSectionForFileWithLongChargerIDsPrintsError() {
-    // TODO: implement
+    String fileName = getRelativeFilePath("file_with_long_charger_ids.txt");
 
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      Object map = App.readStationsSection(reader);
+      reader.close();
+      assertNull(map);
+    });
   }
 
   @Test
   public void testReadStationsSectionForFileWithValidIDs() {
-    // TODO: implement
+    String fileName = getRelativeFilePath("file_with_valid_ids.txt");
 
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      HashMap<Integer, Integer> map = App.readStationsSection(reader);
+      reader.close();
+      assertNotNull(map);
+      assertEquals(4, map.size());
+      assertEquals(Integer.valueOf(0), map.get(Integer.valueOf(1001)));
+      assertEquals(Integer.valueOf(0), map.get(Integer.valueOf(1002)));
+      assertEquals(Integer.valueOf(1), map.get(Integer.valueOf(1003)));
+      assertEquals(Integer.valueOf(2), map.get(Integer.valueOf(1004)));
+      map.clear();
+    });
+  }
+
+  @Test
+  public void testReadStationsSectionForFileWithValidUnsignedIntIDs() {
+    String fileName = getRelativeFilePath("file_with_valid_unsigned_ids.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      HashMap<Integer, Integer> map = App.readStationsSection(reader);
+      reader.close();
+      assertNotNull(map);
+      assertEquals(4, map.size());
+
+      int stationOffset = (int) 2147483648l;
+      int chargerOffset = (int) 3000001000l;
+      assertEquals(Integer.valueOf(stationOffset), map.get(Integer.valueOf(chargerOffset + 1)));
+      assertEquals(Integer.valueOf(stationOffset), map.get(Integer.valueOf(chargerOffset + 2)));
+      assertEquals(Integer.valueOf(stationOffset + 1), map.get(Integer.valueOf(chargerOffset + 3)));
+      assertEquals(Integer.valueOf(stationOffset + 2), map.get(Integer.valueOf(chargerOffset + 4)));
+
+      map.clear();
+    });
   }
 
   // App.readChargerAvailabilityReportsSection(BufferedReader, HashMap<Integer,
   // Integer>)
 
-  // TODO: methods
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForEmptyFileReturnsNull() {
+    String fileName = getRelativeFilePath("empty_file.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithoutHeadersReturnsNull() {
+    String fileName = getRelativeFilePath("file_without_headers.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithoutChargerAvailabilityReportsSectionReturnsNull() {
+    String fileName = getRelativeFilePath("file_without_charger_availability_reports_section.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithNonNumberChargerIDsReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_non_number_charger_ids.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithNonNumberTimesReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_non_number_times.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithNegativeChargerIDsReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_negative_charger_ids.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(-1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(-1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(-1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(-1004), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithNegativeTimesReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_negative_times.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithLongChargerIDsPrintsError() {
+    String fileName = getRelativeFilePath("file_with_long_charger_ids.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      int offset = (int) 10000000001000l;
+      stationsMap.put(Integer.valueOf(offset + 1), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(offset + 2), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(offset + 3), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(offset + 4), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithTooLongTimesPrintsError() {
+    String fileName = getRelativeFilePath("file_with_too_long_times.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithEmptyStationsMapReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_valid_ids.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section, but leave stations map empty
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithValidIDsWithReaderInWrongSectionReturnsNull() {
+    String fileName = getRelativeFilePath("file_with_valid_ids.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Don't simulate reading Stations section, just get stations map
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNull(map);
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithValidIDsAndCorrectStationsMap() {
+    String fileName = getRelativeFilePath("file_with_valid_ids.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNotNull(map);
+      assertEquals(3, map.size());
+
+      // Check each list and their reports, ensure expected behavior
+      List<Report> list0 = map.get(Integer.valueOf(0));
+      List<Report> list1 = map.get(Integer.valueOf(1));
+      List<Report> list2 = map.get(Integer.valueOf(2));
+      assertNotNull(list0);
+      assertNotNull(list1);
+      assertNotNull(list2);
+      assertEquals(3, list0.size());
+      assertEquals(1, list1.size());
+      assertEquals(2, list2.size());
+
+      assertEquals(new Report(0, 50000, true), list0.get(0));
+      assertEquals(new Report(50000, 100000, true), list0.get(1));
+      assertEquals(new Report(50000, 100000, true), list0.get(2));
+      assertEquals(new Report(25000, 75000, false), list1.get(0));
+      assertEquals(new Report(0, 50000, true), list2.get(0));
+      assertEquals(new Report(100000, 200000, true), list2.get(1));
+
+      list0.clear();
+      list1.clear();
+      list2.clear();
+
+      map.clear();
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithValidUnsignedIntIDsAndCorrectStationsMap() {
+    String fileName = getRelativeFilePath("file_with_valid_unsigned_ids.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      int stationOffset = (int) 2147483648l;
+      int chargerOffset = (int) 3000001000l;
+      stationsMap.put(Integer.valueOf(chargerOffset + 1), Integer.valueOf(stationOffset));
+      stationsMap.put(Integer.valueOf(chargerOffset + 2), Integer.valueOf(stationOffset));
+      stationsMap.put(Integer.valueOf(chargerOffset + 3), Integer.valueOf(stationOffset + 1));
+      stationsMap.put(Integer.valueOf(chargerOffset + 4), Integer.valueOf(stationOffset + 2));
+
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNotNull(map);
+      assertEquals(3, map.size());
+
+      // Check each list and their reports, ensure expected behavior
+      List<Report> list0 = map.get(Integer.valueOf(stationOffset));
+      List<Report> list1 = map.get(Integer.valueOf(stationOffset + 1));
+      List<Report> list2 = map.get(Integer.valueOf(stationOffset + 2));
+      assertNotNull(list0);
+      assertNotNull(list1);
+      assertNotNull(list2);
+      assertEquals(3, list0.size());
+      assertEquals(1, list1.size());
+      assertEquals(2, list2.size());
+
+      assertEquals(new Report(0, 50000, true), list0.get(0));
+      assertEquals(new Report(50000, 100000, true), list0.get(1));
+      assertEquals(new Report(50000, 100000, true), list0.get(2));
+      assertEquals(new Report(25000, 75000, false), list1.get(0));
+      assertEquals(new Report(0, 50000, true), list2.get(0));
+      assertEquals(new Report(100000, 200000, true), list2.get(1));
+
+      list0.clear();
+      list1.clear();
+      list2.clear();
+
+      map.clear();
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithValidIDsAndUnsignedLongTimesAndCorrectStationsMap() {
+    String fileName = getRelativeFilePath("file_with_unsigned_long_times.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+      // Simulate reading Stations section and getting stations map
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine());
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      stationsMap.put(Integer.valueOf(1001), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1002), Integer.valueOf(0));
+      stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
+      stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
+
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      stationsMap.clear();
+      reader.close();
+      assertNotNull(map);
+      assertEquals(3, map.size());
+
+      // Check each list and their reports, ensure expected behavior
+      List<Report> list0 = map.get(Integer.valueOf(0));
+      List<Report> list1 = map.get(Integer.valueOf(1));
+      List<Report> list2 = map.get(Integer.valueOf(2));
+      assertNotNull(list0);
+      assertNotNull(list1);
+      assertNotNull(list2);
+      assertEquals(3, list0.size());
+      assertEquals(1, list1.size());
+      assertEquals(2, list2.size());
+
+      long timeOffset = Long.parseUnsignedLong("10000000000000000000");
+
+      assertEquals(new Report(timeOffset, timeOffset + 50000, true), list0.get(0));
+      assertEquals(new Report(timeOffset + 50000, timeOffset + 100000, true), list0.get(1));
+      assertEquals(new Report(timeOffset + 50000, timeOffset + 100000, true), list0.get(2));
+      assertEquals(new Report(timeOffset + 25000, timeOffset + 75000, false), list1.get(0));
+      assertEquals(new Report(timeOffset, timeOffset + 50000, true), list2.get(0));
+      assertEquals(new Report(timeOffset + 100000, timeOffset + 200000, true), list2.get(1));
+
+      list0.clear();
+      list1.clear();
+      list2.clear();
+
+      map.clear();
+    });
+  }
 
   // App.computeStationUptime(List<Report>)
 
@@ -474,7 +722,7 @@ public class AppTest {
     int size = (int) (256 * Math.random());
     HashMap<Integer, List<Report>> map = new HashMap<>(size << 1 + 1);
     for (int i = 0; i < size; i++)
-      map.put(Integer.valueOf(size), new ArrayList<>(0));
+      map.put(Integer.valueOf(i), new ArrayList<>(0));
     int[][] output = App.computeStationUptimes(map);
     assertNotNull(output);
     assertEquals(size, output.length);
@@ -486,8 +734,8 @@ public class AppTest {
     List<Report> list1 = new ArrayList<>(); // 100
     list1.add(new Report(0, 1, true));
     List<Report> list4 = new ArrayList<>(); // 25
-    list1.add(new Report(0, 3, false));
-    list1.add(new Report(3, 4, true));
+    list4.add(new Report(0, 3, false));
+    list4.add(new Report(3, 4, true));
     List<Report> list5 = new ArrayList<>(); // 50
     list5.add(new Report(0, 5, true));
     list5.add(new Report(5, 10, false));
@@ -503,8 +751,4 @@ public class AppTest {
     assertEquals(5, output[2][0]);
     assertEquals(50, output[2][1]);
   }
-
-  // App.printStationUptimes(int[][])
-
-  // TODO: methods
 }
