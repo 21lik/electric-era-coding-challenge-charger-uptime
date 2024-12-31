@@ -18,32 +18,54 @@ import main.App;
 import main.App.Report;
 
 public class AppTest {
+  public static final char ELECTRIC_ERA_CODING_CHALLENGE_CHARGER_UPTIME_DIR_ID = 'E';
+  public static final char CHARGER_UPTIME_DIR_ID = 'C';
+  public static final char SRC_DIR_ID = 'S';
+
   /**
-   * Boolean constant denoting whether AppTest is being run from the
-   * <code>electric-era-coding-challenge-charger-uptime/</code> directory or the
+   * Character constant denoting whether AppTest is being run from the
+   * <code>electric-era-coding-challenge-charger-uptime/</code> parent
+   * directory, the
+   * <code>electric-era-coding-challenge-charger-uptime/ChargerUptime/</code>
+   * directory, or the
    * <code>electric-era-coding-challenge-charger-uptime/ChargerUptime/src/</code>
-   * subdirectory. Set to <code>true</code> if the latter, <code>false</code>
-   * if the former. This is important for setting the correct relative file
-   * path for the text files used for the unit tests below.
+   * subdirectory. Set to
+   * <code>ELECTRIC_ERA_CODING_CHALLENGE_CHARGER_UPTIME_DIR_ID</code> if the
+   * first, <code>CHARGER_UPTIME_DIR_ID</code> if the second, and
+   * <code>SRC_DIR_ID</code> if the third. This is important for setting the
+   * correct relative file path for the text files used for the unit tests
+   * below.
    * <br>
    * </br>
    * It is assumed that the tester will not attempt to run AppTest from a
    * different directory (e.g.
-   * <code>electric-era-coding-challenge-charger-uptime/ChargerUptime/</code> or
    * <code>electric-era-coding-challenge-charger-uptime/ChargerUptime/src/test/</code>).
    */
-  public static final boolean RUNNING_FROM_SRC_SUBDIRECTORY = false;
+  public static final char RUNNING_FROM_SUBDIRECTORY_ID = ELECTRIC_ERA_CODING_CHALLENGE_CHARGER_UPTIME_DIR_ID;
 
   /**
    * Get the relative path for the file with the given name, depending on where
    * the tester is running AppTest. See the documentation for
-   * <code>RUNNING_FROM_SRC_SUBDIRECTORY</code> for the two possible locations.
+   * <code>RUNNING_FROM_SUBDIRECTORY_ID</code> for the three possible
+   * locations.
    *
    * @param fileName the name of the file
    * @return the relative file path
+   * @throws IllegalStateException if <code>RUNNING_FROM_SUBDIRECTORY_ID</code>
+   *                               is not one of the three valid values
    */
   String getRelativeFilePath(String fileName) {
-    return RUNNING_FROM_SRC_SUBDIRECTORY ? "test/" + fileName : "ChargerUptime/src/test/" + fileName;
+    switch (RUNNING_FROM_SUBDIRECTORY_ID) {
+      case ELECTRIC_ERA_CODING_CHALLENGE_CHARGER_UPTIME_DIR_ID:
+        return "ChargerUptime/src/test/" + fileName;
+      case CHARGER_UPTIME_DIR_ID:
+        return "src/test/" + fileName;
+      case SRC_DIR_ID:
+        return "test/" + fileName;
+      default:
+        throw new IllegalStateException("RUNNING_FROM_SUBDIRECTORY_ID is set to an invalid char "
+            + RUNNING_FROM_SUBDIRECTORY_ID + ", please change to one of the three allowed options.");
+    }
   }
 
   // App.readStationsSection(BufferedReader)
