@@ -71,7 +71,7 @@ The program does *not* assume that the report entries are contiguous or in any o
 
 The program also does *not* assume that every station contains at least one charger, nor does it assume that any stations or reports are present. However, nothing would be printed if no stations are present, provided the program does not encounter an error.
 
-The program assumes that the file is small enough to avoid an `OutOfMemoryException`.
+The program assumes that the input file is small enough to avoid an `OutOfMemoryException`.
 
 ## Algorithm Complexity
 
