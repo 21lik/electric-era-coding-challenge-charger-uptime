@@ -17,6 +17,12 @@ import org.junit.jupiter.api.Test;
 import main.App;
 import main.App.Report;
 
+/**
+ * JUnit test class for the Electric Era Coding Challenge for the Software
+ * Engineer (New Grad) position.
+ *
+ * @author Kevin Li
+ */
 public class AppTest {
   public static final char ELECTRIC_ERA_CODING_CHALLENGE_CHARGER_UPTIME_DIR_ID = 'E';
   public static final char CHARGER_UPTIME_DIR_ID = 'C';
@@ -76,7 +82,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -88,7 +95,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      HashMap<Integer, Integer> map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      HashMap<Integer, Integer> map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNotNull(map);
       assertTrue(map.isEmpty());
@@ -101,7 +109,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -113,7 +122,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -125,7 +135,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -137,7 +148,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -149,7 +161,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -161,7 +174,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -173,7 +187,8 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -185,19 +200,21 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
   }
 
   @Test
-  public void testReadStationsSectionForFileWithLongChargerIDsPrintsError() {
+  public void testReadStationsSectionForFileWithLongChargerIDsReturnsNull() {
     String fileName = getRelativeFilePath("file_with_long_charger_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      Object map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      Object map = App.readStationsSection(reader, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -209,15 +226,24 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      HashMap<Integer, Integer> map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      HashMap<Integer, Integer> map = App.readStationsSection(reader, emptyStations);
       reader.close();
+
+      // Check map
       assertNotNull(map);
       assertEquals(4, map.size());
       assertEquals(Integer.valueOf(0), map.get(Integer.valueOf(1001)));
       assertEquals(Integer.valueOf(0), map.get(Integer.valueOf(1002)));
       assertEquals(Integer.valueOf(1), map.get(Integer.valueOf(1003)));
       assertEquals(Integer.valueOf(2), map.get(Integer.valueOf(1004)));
+
+      // Check list
+      assertNotNull(emptyStations);
+      assertTrue(emptyStations.isEmpty());
+
       map.clear();
+      emptyStations.clear();
     });
   }
 
@@ -227,8 +253,11 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
-      HashMap<Integer, Integer> map = App.readStationsSection(reader);
+      List<Integer> emptyStations = new ArrayList<>(0);
+      HashMap<Integer, Integer> map = App.readStationsSection(reader, emptyStations);
       reader.close();
+
+      // Check map
       assertNotNull(map);
       assertEquals(4, map.size());
 
@@ -239,7 +268,38 @@ public class AppTest {
       assertEquals(Integer.valueOf(stationOffset + 1), map.get(Integer.valueOf(chargerOffset + 3)));
       assertEquals(Integer.valueOf(stationOffset + 2), map.get(Integer.valueOf(chargerOffset + 4)));
 
+      // Check list
+      assertNotNull(emptyStations);
+      assertTrue(emptyStations.isEmpty());
+
       map.clear();
+      emptyStations.clear();
+    });
+  }
+
+  @Test
+  public void testReadStationsSectionForFileWithStationsButNoChargers() {
+    String fileName = getRelativeFilePath("file_with_stations_but_no_chargers.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>();
+      HashMap<Integer, Integer> map = App.readStationsSection(reader, emptyStations);
+      reader.close();
+
+      // Check map
+      assertNotNull(map);
+      assertTrue(map.isEmpty());
+
+      // Check list
+      assertNotNull(emptyStations);
+      assertEquals(3, emptyStations.size());
+      assertEquals(Integer.valueOf(0), emptyStations.get(0));
+      assertEquals(Integer.valueOf(1), emptyStations.get(1));
+      assertEquals(Integer.valueOf(2), emptyStations.get(2));
+
+      map.clear();
+      emptyStations.clear();
     });
   }
 
@@ -252,13 +312,14 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
         ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -270,13 +331,14 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
         ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
 
-      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       reader.close();
       assertNotNull(map);
       assertTrue(map.isEmpty());
@@ -289,6 +351,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -299,7 +362,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -312,6 +375,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -322,7 +386,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -332,6 +396,7 @@ public class AppTest {
   @Test
   public void testReadChargerAvailabilityReportsSectionForFileWithNonNumberChargerIDsReturnsNull() {
     String fileName = getRelativeFilePath("file_with_non_number_charger_ids.txt");
+    List<Integer> emptyStations = new ArrayList<>(0);
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
@@ -341,7 +406,7 @@ public class AppTest {
         ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -354,6 +419,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -364,7 +430,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -377,6 +443,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -387,7 +454,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(-1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(-1004), Integer.valueOf(2));
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -400,6 +467,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -410,7 +478,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -418,11 +486,12 @@ public class AppTest {
   }
 
   @Test
-  public void testReadChargerAvailabilityReportsSectionForFileWithLongChargerIDsPrintsError() {
+  public void testReadChargerAvailabilityReportsSectionForFileWithLongChargerIDsReturnsNull() {
     String fileName = getRelativeFilePath("file_with_long_charger_ids.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -434,7 +503,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(offset + 3), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(offset + 4), Integer.valueOf(2));
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -442,11 +511,12 @@ public class AppTest {
   }
 
   @Test
-  public void testReadChargerAvailabilityReportsSectionForFileWithTooLongTimesPrintsError() {
+  public void testReadChargerAvailabilityReportsSectionForFileWithTooLongTimesReturnsNull() {
     String fileName = getRelativeFilePath("file_with_too_long_times.txt");
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -457,7 +527,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -470,13 +540,14 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section, but leave stations map empty
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
         ;
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       reader.close();
       assertNull(map);
     });
@@ -488,6 +559,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Don't simulate reading Stations section, just get stations map
       HashMap<Integer, Integer> stationsMap = new HashMap<>();
@@ -496,7 +568,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
-      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      Object map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNull(map);
@@ -509,6 +581,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -519,7 +592,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
-      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNotNull(map);
@@ -557,6 +630,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -569,7 +643,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(chargerOffset + 3), Integer.valueOf(stationOffset + 1));
       stationsMap.put(Integer.valueOf(chargerOffset + 4), Integer.valueOf(stationOffset + 2));
 
-      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNotNull(map);
@@ -607,6 +681,7 @@ public class AppTest {
 
     assertDoesNotThrow(() -> {
       final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
 
       // Simulate reading Stations section and getting stations map
       for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
@@ -617,7 +692,7 @@ public class AppTest {
       stationsMap.put(Integer.valueOf(1003), Integer.valueOf(1));
       stationsMap.put(Integer.valueOf(1004), Integer.valueOf(2));
 
-      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap);
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
       stationsMap.clear();
       reader.close();
       assertNotNull(map);
@@ -648,6 +723,45 @@ public class AppTest {
       list2.clear();
 
       map.clear();
+    });
+  }
+
+  @Test
+  public void testReadChargerAvailabilityReportsSectionForFileWithStationsButNoChargers() {
+    String fileName = getRelativeFilePath("file_with_stations_but_no_chargers.txt");
+
+    assertDoesNotThrow(() -> {
+      final BufferedReader reader = new BufferedReader(new FileReader(fileName));
+      List<Integer> emptyStations = new ArrayList<>(0);
+
+      // Simulate reading Stations section and getting stations map
+      // In this case we add the stations to emptyStations list instead
+      for (String nextLine = reader.readLine(); nextLine != null && !nextLine.isBlank(); nextLine = reader.readLine())
+        ;
+      HashMap<Integer, Integer> stationsMap = new HashMap<>();
+      emptyStations.add(Integer.valueOf(0));
+      emptyStations.add(Integer.valueOf(1));
+      emptyStations.add(Integer.valueOf(2));
+
+      HashMap<Integer, List<Report>> map = App.readChargerAvailabilityReportsSection(reader, stationsMap, emptyStations);
+      stationsMap.clear();
+      reader.close();
+      assertNotNull(map);
+      assertEquals(3, map.size());
+
+      // Check each list, ensure lists exist but are empty
+      List<Report> list0 = map.get(Integer.valueOf(0));
+      List<Report> list1 = map.get(Integer.valueOf(1));
+      List<Report> list2 = map.get(Integer.valueOf(2));
+      assertNotNull(list0);
+      assertNotNull(list1);
+      assertNotNull(list2);
+      assertTrue(list0.isEmpty());
+      assertTrue(list1.isEmpty());
+      assertTrue(list2.isEmpty());
+
+      map.clear();
+      emptyStations.clear();
     });
   }
 

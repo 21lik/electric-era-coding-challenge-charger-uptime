@@ -1,0 +1,6 @@
+[Stations]
+0
+1
+2
+
+[Charger Availability Reports]

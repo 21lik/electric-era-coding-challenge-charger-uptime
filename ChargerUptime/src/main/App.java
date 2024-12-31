@@ -60,10 +60,12 @@ public class App {
    * its respective station. Prints an error and returns <code>null</code> if
    * the file format is invalid.
    *
-   * @param reader the BufferedReader for the given file
+   * @param reader        the BufferedReader for the given file
+   * @param emptyStations an auxiliary list to store station IDs with no
+   *                      charger IDs
    * @return a map of each charger ID to its station ID
    */
-  public static HashMap<Integer, Integer> readStationsSection(BufferedReader reader) {
+  public static HashMap<Integer, Integer> readStationsSection(BufferedReader reader, List<Integer> emptyStations) {
     try {
       String nextLine = reader.readLine();
       if (nextLine == null || !nextLine.equals("[Stations]")) {
@@ -80,6 +82,11 @@ public class App {
         String[] tokens = nextLine.split(" ");
         try {
           Integer stationId = Integer.valueOf(Integer.parseUnsignedInt(tokens[0]));
+          if (tokens.length == 1) {
+            // No Charger IDs found for this station, proceed
+            emptyStations.add(stationId);
+            continue;
+          }
           for (int i = 1; i < tokens.length; i++) {
             output.put(Integer.valueOf(Integer.parseUnsignedInt(tokens[i])), stationId);
           }
@@ -104,14 +111,16 @@ public class App {
    * Read and process the Charger Availability Reports section of the file,
    * mapping each station to its reported uptime/downtime intervals. Prints an
    * error and returns <code>null</code> if the file format is invalid. It is
-   * assumed that <code>stationMap</code> is not <code>null</code>.
+   * assumed that <code>stationMap</code> is not null.
    *
-   * @param reader     the BufferedReader for the given file
-   * @param stationMap a map of each charger ID to its station ID
+   * @param reader        the BufferedReader for the given file
+   * @param stationMap    a map of each charger ID to its station ID
+   * @param emptyStations an auxiliary list containing station IDs with no
+   *                      charger IDs
    * @return a map of each station ID to its reported time intervals
    */
   public static HashMap<Integer, List<Report>> readChargerAvailabilityReportsSection(BufferedReader reader,
-      HashMap<Integer, Integer> stationMap) {
+      HashMap<Integer, Integer> stationMap, List<Integer> emptyStations) {
     try {
       String nextLine = reader.readLine();
       if (nextLine == null || !nextLine.equals("[Charger Availability Reports]")) {
@@ -122,6 +131,10 @@ public class App {
       }
 
       HashMap<Integer, List<Report>> output = new HashMap<>();
+
+      // Put empty stations in output, no reports
+      for (Integer emptyStation : emptyStations)
+        output.put(emptyStation, new ArrayList<>(0));
 
       // Read each line
       for (nextLine = reader.readLine(); nextLine != null; nextLine = reader.readLine()) {
@@ -165,7 +178,7 @@ public class App {
           endTime = Long.parseUnsignedLong(tokens[2]);
         } catch (NumberFormatException e) {
           System.out.println("ERROR");
-          System.err.println("Start and end times must be unsigned 64-bit integers");
+          System.err.println("Start and end times must be unsigned 64-bit integers.");
           reader.close();
           output.clear();
           return null;
@@ -186,6 +199,7 @@ public class App {
   /**
    * Compute the uptimes for the station given its reported time intervals. The
    * list of reports is cleared after the function call to free memory storage.
+   * It is assumed that <code>stationTimeReports</code> is not null.
    *
    * @param stationTimeReports a list of the station's reported time intervals
    * @return the station uptime, as a truncated percentage
@@ -298,11 +312,16 @@ public class App {
       return;
     }
 
-    HashMap<Integer, Integer> stationsMap = readStationsSection(reader);
-    if (stationsMap == null)
+    List<Integer> emptyStations = new ArrayList<>();
+    HashMap<Integer, Integer> stationsMap = readStationsSection(reader, emptyStations);
+    if (stationsMap == null) {
+      emptyStations.clear();
       return; // Error in Stations section
+    }
 
-    HashMap<Integer, List<Report>> stationReportsMap = readChargerAvailabilityReportsSection(reader, stationsMap);
+    HashMap<Integer, List<Report>> stationReportsMap = readChargerAvailabilityReportsSection(reader, stationsMap,
+        emptyStations);
+    emptyStations.clear();
     if (stationsMap.isEmpty())
       return; // No stations, nothing to output
     stationsMap.clear();
